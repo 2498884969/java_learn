@@ -12,11 +12,11 @@ cp -a /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
 
 2.修改CentOS-Base.repo文件，取消baseurl开头的行的注释，并增加mirrorlist开头的行的注释。
 将文件中的http://mirror.centos.org替换成https://mirrors.huaweicloud.com，可以参考如下命令：
-sed -i "s/#baseurl/baseurl/g" /etc/yum.repos.d/CentOS-Base.repo
-sed -i "s/mirrorlist=http/#mirrorlist=http/g" /etc/yum.repos.d/CentOS-Base.repo
-sed -i "s@http://mirror.centos.org@https://mirrors.huaweicloud.com@g" /etc/yum.repos.d/CentOS-Base.repo
+    sed -i "s/#baseurl/baseurl/g" /etc/yum.repos.d/CentOS-Base.repo
+    sed -i "s/mirrorlist=http/#mirrorlist=http/g" /etc/yum.repos.d/CentOS-Base.repo
+    sed -i "s@http://mirror.centos.org@https://mirrors.huaweicloud.com@g" /etc/yum.repos.d/CentOS-Base.repo
 
-3、执行yum clean all清除原有yum缓存。
+    3、执行yum clean all清除原有yum缓存。
 
 4、执行yum makecache（刷新缓存）或者yum repolist all（查看所有配置可以使用的文件，会自动刷新缓存）。
 ```
