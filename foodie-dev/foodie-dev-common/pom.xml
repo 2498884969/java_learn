@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>foodie-dev</artifactId>
+        <groupId>com.immoc</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>foodie-dev-common</artifactId>
+    <!--
+        1. 聚合工程可以分为顶级项目（顶级工程、父工程）与子工程，这两者的依赖关系其实就是父子继承的关系
+        子工程在maven里面称为模块(module)，模块之间是平级的，是可以互相依赖的。
+        2. 子模块可以使用顶级工程里面所有的资源，子模块之间如果要使用资源，必须构建依赖
+        3. 一个顶级工程可以由多个不同的子工程共同组合而成
+    -->
+
+    <!--默认打包方式为jar-->
+</project>
