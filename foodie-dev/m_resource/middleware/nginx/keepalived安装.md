@@ -100,3 +100,139 @@ vrrp_instance VI_1 {
 }
 ```
 
+## 配置nginx自动重启
+
+#### 1. 增加Nginx重启检测脚本
+
+```shell
+vim /etc/keepalived/check_nginx_alive_or_not.sh
+```
+
+----------
+
+```shell
+#!/bin/bash
+
+A=`ps -C nginx --no-header |wc -l`
+# 判断nginx是否宕机，如果宕机了，尝试重启
+if [ $A -eq 0 ];then
+    /usr/local/nginx/sbin/nginx
+    # 等待一小会再次检查nginx，如果没有启动成功，则停止keepalived，使其启动备用机
+    sleep 3
+    if [ `ps -C nginx --no-header |wc -l` -eq 0 ];then
+        killall keepalived
+    fi
+fi
+```
+
+增加运行权限
+
+```shell
+chmod +x /etc/keepalived/check_nginx_alive_or_not.sh
+```
+
+#### 2. 配置keepalived监听nginx脚本
+
+```shell
+vrrp_script check_nginx_alive {
+    script "/etc/keepalived/check_nginx_alive_or_not.sh"
+    interval 2 # 每隔两秒运行上一行脚本
+    weight 10 # 如果脚本运行成功，则升级权重+10
+    # weight -10 # 如果脚本运行失败，则升级权重-10
+}
+```
+
+#### 3. 在`vrrp_instance`中新增监控的脚本
+
+```
+track_script {
+    check_nginx_alive   # 追踪 nginx 脚本
+}
+```
+
+#### 4. 重启Keepalived使得配置文件生效
+
+```shell
+systemctl restart keepalived
+```
+
+## 双主热备
+
+规则：以一个虚拟ip分组归为同一个路由
+
+#### 主节点配置：
+
+```
+global_defs {
+   router_id keep_171
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens33
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.161
+    }
+}
+
+vrrp_instance VI_2 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 52
+    priority 80
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.162
+    }
+}
+```
+
+#### 备用节点配置
+
+```
+global_defs {
+   router_id keep_172
+}
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 51
+    priority 80
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.161
+    }
+}
+
+vrrp_instance VI_2 {
+    state MASTER
+    interface ens33
+    virtual_router_id 52
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.162
+    }
+}
+```
+
