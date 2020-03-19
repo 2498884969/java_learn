@@ -179,7 +179,7 @@ ipvsadm -S
 - 查看集群列表
 
 ```shell
-ipvsadm -Ln
+  ipvsadm -Ln
 ```
 
 - 查看集群状态
@@ -202,7 +202,9 @@ ipvsadm -Lnc
 ipvsadm --set 1 1 1
 # 查看过期时间
 ipvsadm -Ln --timeout
-
+# 查看当前连接
 ipvsadm -Lnc
+# 清空存储
+ipvsadm -C
 ```
 

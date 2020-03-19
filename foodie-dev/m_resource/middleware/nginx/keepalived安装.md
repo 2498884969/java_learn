@@ -1,11 +1,11 @@
 ## 1. 安装
 
 ```shell
-yum -y install libnl libnl-devel  libnfnetlink-devel
+yum -y install libnl libnl-devel  libnfnetlink-devel gcc openssl
 
 tar -zxvf keepalived-2.0.18.tar.gz
 
-./configure --prefix=/usr/local/keepalived --sysconf=/etc
+  ./configure --prefix=/usr/local/keepalived --sysconf=/etc
 
 make && make install
 ```
@@ -19,7 +19,6 @@ make && make install
 cp init.d/keepalived /etc/init.d/
 cp sysconfig/keepalived /etc/sysconfig/
 cp /usr/local/keepalived/sbin/keepalived /usr/sbin/
-
 
 ```
 
