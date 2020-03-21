@@ -16,9 +16,9 @@ sed -i "s/#baseurl/baseurl/g" /etc/yum.repos.d/CentOS-Base.repo
 sed -i "s/mirrorlist=http/#mirrorlist=http/g" /etc/yum.repos.d/CentOS-Base.repo
 sed -i "s@http://mirror.centos.org@https://mirrors.huaweicloud.com@g" /etc/yum.repos.d/CentOS-Base.repo
 
-      3、执行yum clean all清除原有yum缓存。
+3、执行yum clean all清除原有yum缓存。
 
-  4、执行yum makecache（刷新缓存）或者yum repolist all（查看所有配置可以使用的文件，会自动刷新缓存）。
+4、执行yum makecache（刷新缓存）或者yum repolist all（查看所有配置可以使用的文件，会自动刷新缓存）。
 ```
 
 ## 3.安装 openssh
