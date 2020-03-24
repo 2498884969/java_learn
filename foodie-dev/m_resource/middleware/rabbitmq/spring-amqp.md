@@ -27,3 +27,35 @@
 ![](./img/rabbit-template1.png)
 
 ![](./img/rabbit-template2.png)
+
+## 3. SimpleMessageListenerContainer
+
+![](./img/SimpleMessageListenerContainer1.png)
+
+
+
+---
+
+![](./img/SimpleMessageListenerContainer2.png)
+
+
+
+---
+
+![](./img/SimpleMessageListenerContainer3.png)
+
+---
+
+![](./img/SimpleMessageListenerContainer4.png)
+
+## 4. MessageAdapter
+
+![](./img/MessageAdapter.png)
+
+---
+
+![](./img/MessageListenerAdapter1.png)
+
+---
+
+![](./img/MessageListenerAdapter2.png)
