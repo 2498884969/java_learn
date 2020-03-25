@@ -59,3 +59,18 @@
 ---
 
 ![](./img/MessageListenerAdapter2.png)
+
+## 5. MessageConvert
+
+![](./img/MessageConvert1.png)
+
+---
+
+![](./img/MessageConvert2.png)
+
+## python相关
+
+> https://www.cnblogs.com/ydf0509/p/10190767.html
+
+
+
