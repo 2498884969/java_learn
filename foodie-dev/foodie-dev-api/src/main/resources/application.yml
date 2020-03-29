@@ -23,6 +23,9 @@ spring:
     multipart:
       max-file-size: 512000           # 图片最大为500kb
       max-request-size: 512000        # 请求最大为500kb
+  redis:
+    host: 192.168.1.60
+    password: imooc
 ############################################################
 #
 # mybatis 配置
