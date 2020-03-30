@@ -4,14 +4,18 @@ package com.imooc.controller;
 import com.imooc.enums.OrderStatusEnum;
 import com.imooc.enums.PayMethod;
 import com.imooc.pojo.OrderStatus;
+import com.imooc.pojo.bo.ShopcartBO;
 import com.imooc.pojo.bo.SubmitOrderBO;
 import com.imooc.pojo.vo.MerchantOrdersVO;
 import com.imooc.pojo.vo.OrderVO;
 import com.imooc.service.OrdersService;
 import com.imooc.utils.CookieUtils;
 import com.imooc.utils.IMOOCJSONResult;
+import com.imooc.utils.JsonUtils;
+import com.imooc.utils.RedisOperator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Api(value = "订单相关", tags = {"订单相关接口"})
 @RestController
@@ -31,6 +36,9 @@ public class OrdersController extends BaseController {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    RedisOperator redisOperator;
+
     @ApiOperation(value = "创建订单", notes = "创建订单", httpMethod = "POST")
     @PostMapping("/create")
     public IMOOCJSONResult create(@RequestBody SubmitOrderBO submitOrderBO,
@@ -42,8 +50,17 @@ public class OrdersController extends BaseController {
             return IMOOCJSONResult.errorMsg("非法的支付方式");
         }
 
+        // 获取购物车中的商品
+        String key = FOODIE_SHOPCART + ":" + submitOrderBO.getUserId();
+        String shopCartListStr = redisOperator.get(key);
+        if (StringUtils.isBlank(shopCartListStr)) {
+            return IMOOCJSONResult.errorMsg("购物车数据有误");
+        }
+
+        List<ShopcartBO> shopcartBOList = JsonUtils.jsonToList(shopCartListStr, ShopcartBO.class);
+
         // 1. 创建订单
-        OrderVO orderVO = ordersService.createOrder(submitOrderBO);
+        OrderVO orderVO = ordersService.createOrder(shopcartBOList, submitOrderBO);
         String orderId = orderVO.getOrderId();
 
         // 2. 创建订单后移除购物车中已结算的商品

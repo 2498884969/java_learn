@@ -6,6 +6,7 @@ import com.imooc.mapper.OrderItemsMapper;
 import com.imooc.mapper.OrderStatusMapper;
 import com.imooc.mapper.OrdersMapper;
 import com.imooc.pojo.*;
+import com.imooc.pojo.bo.ShopcartBO;
 import com.imooc.pojo.bo.SubmitOrderBO;
 import com.imooc.pojo.vo.MerchantOrdersVO;
 import com.imooc.pojo.vo.OrderVO;
@@ -45,7 +46,7 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public OrderVO createOrder(SubmitOrderBO submitOrderBO) {
+    public OrderVO createOrder(List<ShopcartBO> shopcartBOList, SubmitOrderBO submitOrderBO) {
 
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
@@ -85,9 +86,11 @@ public class OrdersServiceImpl implements OrdersService {
         Integer realPayAmount = 0;
 
         for (String specId: itemSpecIdArr) {
+            ShopcartBO shopcartBO = getCountsFromShopCartList(shopcartBOList, specId);
+            int buyCounts = shopcartBO.getBuyCounts();
+            // 整合redis后，商品购买的信息重新从Redis中的购物车获取
 
-            int buyCounts = 1;
-            // TODO 整合redis后，商品购买的信息重新从Redis中的购物车获取
+
             // 2.1 根据规格ID,查询规格具体信息,主要获取价格
             ItemsSpec itemsSpec = itemService.queryItemSpecById(specId);
             totalAmount += itemsSpec.getPriceNormal() * buyCounts;
@@ -137,6 +140,24 @@ public class OrdersServiceImpl implements OrdersService {
         orderVO.setOrderId(orderId);
 
         return orderVO;
+    }
+
+    /**
+     *
+     * @param shopcartBOList
+     * @param specId
+     * @return
+     */
+    private ShopcartBO getCountsFromShopCartList(List<ShopcartBO> shopcartBOList, String specId){
+
+        ShopcartBO shopcartBORet = null;
+        for (ShopcartBO scb: shopcartBOList){
+             if (scb.getSpecId().equals(specId)) {
+                 shopcartBORet = scb;
+                 break;
+             }
+         }
+        return shopcartBORet;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

@@ -3,12 +3,16 @@ package com.imooc.controller;
 import com.imooc.enums.YesOrNo;
 import com.imooc.pojo.Carousel;
 import com.imooc.pojo.Category;
+import com.imooc.pojo.vo.CategoryVO;
 import com.imooc.service.CarouselService;
 import com.imooc.service.CategoryService;
 import com.imooc.utils.IMOOCJSONResult;
+import com.imooc.utils.JsonUtils;
+import com.imooc.utils.RedisOperator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,9 @@ public class IndexController {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    RedisOperator redisOperator;
+
     @ApiIgnore
     @GetMapping("/setSession")
     public Object setSession(HttpServletRequest request) {
@@ -49,7 +56,14 @@ public class IndexController {
     @GetMapping("/carousel")
     public IMOOCJSONResult carousel() {
 
+        // 先从缓存中查询缓存中查不到再去redis中查询
+        String res = redisOperator.get("carousel");
+        if (!StringUtils.isBlank(res)) {
+            return IMOOCJSONResult.ok(JsonUtils.jsonToList(res, Carousel.class));
+        }
+
         List<Carousel> carouselList = carouselService.queryAll(YesOrNo.YES.type);
+        redisOperator.set("carousel", JsonUtils.objectToJson(carouselList));
         return IMOOCJSONResult.ok(carouselList);
     }
 
@@ -62,7 +76,16 @@ public class IndexController {
     @ApiOperation(value = "获取所有根分类", notes = "获取所有根分类", httpMethod = "GET")
     @GetMapping("/cats")
     public IMOOCJSONResult cats() {
+
+
+        String categoryListStr = redisOperator.get("cats");
+        if (!StringUtils.isBlank(categoryListStr)){
+            return IMOOCJSONResult.ok(JsonUtils.jsonToList(categoryListStr, Category.class));
+        }
+
         List<Category> categoryList = categoryService.queryAllRootLevelCat();
+        redisOperator.set("cats", JsonUtils.objectToJson(categoryList));
+
         return IMOOCJSONResult.ok(categoryList);
     }
 
@@ -79,7 +102,17 @@ public class IndexController {
             return IMOOCJSONResult.errorMsg("分类不存在");
         }
 
-        return IMOOCJSONResult.ok(categoryService.getSubCatList(rootCatId));
+        String key = "subCat:" + rootCatId;
+        String categoryVOListStr = redisOperator.get(key);
+        if (!StringUtils.isBlank(categoryVOListStr)){
+            return IMOOCJSONResult.ok(JsonUtils.jsonToList(categoryVOListStr, CategoryVO.class));
+        }
+
+        List<CategoryVO> categoryVOList = categoryService.getSubCatList(rootCatId);
+        redisOperator.set(key, JsonUtils.objectToJson(categoryVOList));
+
+
+        return IMOOCJSONResult.ok(categoryVOList);
     }
 
     /**

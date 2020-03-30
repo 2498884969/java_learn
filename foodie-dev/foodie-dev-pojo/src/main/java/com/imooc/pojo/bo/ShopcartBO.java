@@ -1,5 +1,7 @@
 package com.imooc.pojo.bo;
 
+import io.swagger.models.auth.In;
+
 public class ShopcartBO {
 
     private String itemId;
@@ -7,7 +9,7 @@ public class ShopcartBO {
     private String itemName;
     private String specId;
     private String specName;
-    private String buyCounts;
+    private Integer buyCounts;
     private String priceDiscount;
     private String priceNormal;
 
@@ -51,11 +53,11 @@ public class ShopcartBO {
         this.specName = specName;
     }
 
-    public String getBuyCounts() {
+    public Integer getBuyCounts() {
         return buyCounts;
     }
 
-    public void setBuyCounts(String buyCounts) {
+    public void setBuyCounts(Integer buyCounts) {
         this.buyCounts = buyCounts;
     }
 

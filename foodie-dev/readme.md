@@ -43,5 +43,5 @@ docker run --name mysqlserver -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:
 
 2. 安装ng
 
-docker run -d -p 8080:80 --name fronted -v /Users/qiangxuhui/fronted:/usr/share/nginx/html nginx
+docker run -d -p 8080:80 --name fronted -v /Users/qiangxuhui/GitHub/java_learn/fronted:/usr/share/nginx/html nginx
 ```
