@@ -63,9 +63,15 @@ public class OrdersController extends BaseController {
         OrderVO orderVO = ordersService.createOrder(shopcartBOList, submitOrderBO);
         String orderId = orderVO.getOrderId();
 
-        // 2. 创建订单后移除购物车中已结算的商品
-//        CookieUtils.setCookie(request, response, FOODIE_SHOPCART,"",true);
-        // 3. 向支付中心发送订单，用于保存支付中心的订单数据
+        // 2. 移除购物车中的商品
+        shopcartBOList.removeAll(orderVO.getToBeRemovedShopCartList());
+        // 3. 刷新redis中的数据
+        redisOperator.set(key, JsonUtils.objectToJson(shopcartBOList));
+
+        // 4. 创建订单后移除购物车中已结算的商品     cookie
+        CookieUtils.setCookie(request, response, FOODIE_SHOPCART,
+                JsonUtils.objectToJson(shopcartBOList),true);
+        // 5. 向支付中心发送订单，用于保存支付中心的订单数据
         MerchantOrdersVO merchantOrdersVO = orderVO.getMerchantOrdersVO();
         merchantOrdersVO.setReturnUrl(payReturnUrl);
 
@@ -85,6 +91,9 @@ public class OrdersController extends BaseController {
         if (paymentResult.getStatus() != 200){
             return IMOOCJSONResult.errorMsg("订单支付失败");
         }
+
+
+
 
         return IMOOCJSONResult.ok(orderId);
     }
