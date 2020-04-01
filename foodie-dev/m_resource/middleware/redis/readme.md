@@ -93,3 +93,62 @@ save 10 3
 3. rdbchecksum
    - yes：使用CRC64算法校验对rdb进行数据校验，有10%性能损耗
    - no：不校验
+
+### 5. AOF特点
+
+1. 以日志的形式来记录用户请求的写操作。读操作不会记录，因为写操作才会存存储。
+2. 文件以追加的形式而不是修改的形式。
+3. redis的aof恢复其实就是把追加的文件从开始到结尾读取执行写操作。
+
+### 6. AOF优势
+
+1. AOF更加耐用，可以以秒级别为单位备份，如果发生问题，也只会丢失最后一秒的数据，大大增加了可靠性和数据完整性。所以AOF可以每秒备份一次，使用fsync操作。
+2. 以log日志形式追加，如果磁盘满了，会执行 redis-check-aof 工具
+3. 当数据太大的时候，redis可以在后台自动重写aof。当redis继续把日志追加到老的文件中去时，重写也是非常安全的，不会影响客户端的读写操作。
+4. AOF 日志包含的所有写操作，会更加便于redis的解析恢复。
+
+### 7. AOF劣势
+
+1. 相同的数据，同一份数据，AOF比RDB大
+2. 针对不同的同步机制，AOF会比RDB慢，因为AOF每秒都会备份做写操作，这样相对与RDB来说就略低。 每秒备份fsync没毛病，但是如果客户端的每次写入就做一次备份fsync的话，那么redis的性能就会下降。
+3. AOF发生过bug，就是数据恢复的时候数据不完整，这样显得AOF会比较脆弱，容易出现bug，因为AOF没有RDB那么简单，但是呢为了防止bug的产生，AOF就不会根据旧的指令去重构，而是根据当时缓存中存在的数据指令去做重构，这样就更加健壮和可靠了。
+
+### 8. AOF配置
+
+```shell
+# AOF 默认关闭，yes可以开启
+appendonly no
+
+# AOF 的文件名
+appendfilename "appendonly.aof"
+
+# no：不同步
+# everysec：每秒备份，推荐使用
+# always：每次操作都会备份，安全并且数据完整，但是慢性能差
+appendfsync everysec
+
+# 重写的时候是否要同步，no可以保证数据安全
+no-appendfsync-on-rewrite no
+
+# 重写机制：避免文件越来越大，自动优化压缩指令，会fork一个新的进程去完成重写动作，新进程里的内存数据会被重写，此时旧的aof文件不会被读取使用，类似rdb
+# 当前AOF文件的大小是上次AOF大小的100% 并且文件体积达到64m，满足两者则触发重写
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+```
+
+### 9. 到底采用RDB还是AOF呢？
+
+1. 如果你能接受一段时间的缓存丢失，那么可以使用RDB
+2. 如果你对实时性的数据比较care，那么就用AOF
+3. 使用RDB和AOF结合一起做持久化，RDB做冷备，可以在不同时期对不同版本做恢复，AOF做热备，保证数据仅仅只有1秒的损失。当AOF破损不可用了，那么再用RDB恢复，这样就做到了两者的相互结合，也就是说Redis恢复会先加载AOF，如果AOF有问题会再加载RDB，这样就达到冷热备份的目的了。
+
+### 10. RDB-AOF混合
+
+> https://blog.csdn.net/yhl_jxy/article/details/91879874
+
+### 11.主从复制
+
+> https://blog.csdn.net/caokun12321/article/details/81225410
+
+
+
