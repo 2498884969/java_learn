@@ -150,5 +150,120 @@ auto-aof-rewrite-min-size 64mb
 
 > https://blog.csdn.net/caokun12321/article/details/81225410
 
+### 12. redis缓存过期处理与内存淘汰机制
 
+- **已经过期的key如何处理？**
+
+设置了expire的key缓存过期了，但是服务器的内存还是会被占用，这是因为redis所基于的两种删除策略
+redis有两种策略：
+
+1. （主动）定时删除
+   - 定时随机的检查过期的key，如果过期则清理删除。（每秒检查次数在redis.conf中的hz配置）
+2. （被动）惰性删除
+   - 当客户端请求一个已经过期的key的时候，那么redis会检查这个key是否过期，如果过期了，则删除，然后返回一个nil。这种策略对cpu比较友好，不会有太多的损耗，但是内存占用会比较高。
+
+所以，虽然key过期了，但是只要没有被redis清理，那么其实内存还是会被占用着的。
+
+- **如果内存被redis占用满了怎么办？**
+
+内存占满了，可以使用硬盘，来保存，但是没意义，因为硬盘没有内存快，会影响redis性能。
+所以，当内存占用满了以后，redis提供了一套缓存淘汰机制：MEMORY MANAGEMENT
+
+`maxmemory`：当内存已使用率到达，则开始清理缓存
+
+```
+* noeviction：旧缓存永不过期，新缓存设置不了，返回错误
+* allkeys-lru：清除最少用的旧缓存，然后保存新的缓存（推荐使用）
+* allkeys-random：在所有的缓存中随机删除（不推荐）
+* volatile-lru：在那些设置了expire过期时间的缓存中，清除最少用的旧缓存，然后保存新的缓存
+* volatile-random：在那些设置了expire过期时间的缓存中，随机删除缓存
+* volatile-ttl：在那些设置了expire过期时间的缓存中，删除即将过期的
+```
+
+## 3. Redis-sentinel
+
+- **主从配置选项**
+
+```shell
+# 主节点密码
+masterauth pass
+# 指定主节点
+replicaof <masterip> <masterport>
+```
+
+- **redis-sentien相关配置**
+
+```shell
+# Base
+protected-mode no
+port 26379
+daemonize yes
+pidfile /var/run/redis-sentinel.pid
+logfile /usr/local/redis/sentinel/redis-sentinel.log
+dir /usr/local/redis/sentinel
+
+# Core
+# 告诉sentinel去监听地址为ip:port的一个master，这里的master-name可以自定义，quorum是一个数字，指明当有多少个sentinel认为一个master失效时，master才算真正失效。
+sentinel monitor imooc-master 192.168.1.60 6379
+# 设置连接master和slave时的密码
+# sentinel auth-pass <master-name> <password>
+sentinel auth-pass imooc-master imooc
+这个配置项指定了需要多少失效时间，一个master才会被这个sentinel主观地认为是不可用的。
+sentinel down-after-milliseconds mymaster 10000
+
+# sentinel parallel-syncs <master-name> <numslaves> 
+# 这个配置项指定了在发生failover主备切换时最多可以有多少个slave同时对新的master进行 同步，这个数字越小，完成failover所需的时间就越长，但是如果这个数字越大，就意味着越 多的slave因为replication而不可用。可以通过将这个值设为 1 来保证每次只有一个slave 处于不能处理命令请求的状态。
+sentinel parallel-syncs imooc-master 1
+
+# sentinel failover-timeout <master-name> <milliseconds>
+# failover-timeout 可以用在以下这些方面： 
+#      1. 同一个sentinel对同一个master两次failover之间的间隔时间。
+#      2. 当一个slave从一个错误的master那里同步数据开始计算时间。直到slave被纠正为向正确的master那里同步数据时。
+#      3.当想要取消一个正在进行的failover所需要的时间。  
+#     4.当进行failover时，配置所有slaves指向新的master所需的最大时间。不过，即使过了这个超时，slaves依然会被正确配置为指向master，但是就不按parallel-syncs所配置的规则来了。
+sentinel failover-timeout imooc-master 20000
+```
+
+> 参考：https://www.cnblogs.com/xuliangxing/p/7149322.html
+
+```shell
+# Base
+protected-mode no
+port 26379
+daemonize yes
+pidfile /var/run/redis-sentinel.pid
+logfile /usr/local/redis/sentinel/redis-sentinel.log
+dir /usr/local/redis/sentinel
+# Core
+sentinel monitor imooc-master 192.168.0.60 6379 2
+sentinel auth-pass imooc-master imooc
+sentinel down-after-milliseconds imooc-master 10000
+sentinel parallel-syncs imooc-master 1
+sentinel failover-timeout imooc-master 20000
+```
+
+- 哨兵相关命令**
+
+```
+# 查看imooc-master下的master节点信息
+sentinel master imooc-master
+
+# 查看imooc-master下的slaves节点信息
+sentinel slaves imooc-master
+
+# 查看imooc-master下的哨兵节点信息
+sentinel sentinels imooc-master
+```
+
+- **spring-boot继承哨兵**
+
+```shell
+spring:
+  redis:
+    database: 1
+    password: imooc
+    sentinel:
+      master: imooc-master
+      nodes: 192.168.1.60:26379,192.168.1.65:26379,192.168.1.66:26379
+```
 

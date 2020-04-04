@@ -24,8 +24,11 @@ spring:
       max-file-size: 512000           # 图片最大为500kb
       max-request-size: 512000        # 请求最大为500kb
   redis:
-    host: 192.168.1.60
+#    host: 192.168.1.60
     password: imooc
+    sentinel:
+      master: imooc-master
+      nodes: 192.168.1.60:26379,192.168.1.65:26379,192.168.1.66:26379
 ############################################################
 #
 # mybatis 配置
