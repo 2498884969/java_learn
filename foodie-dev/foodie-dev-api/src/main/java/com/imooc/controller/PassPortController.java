@@ -3,11 +3,13 @@ package com.imooc.controller;
 import com.imooc.pojo.Users;
 import com.imooc.pojo.bo.ShopcartBO;
 import com.imooc.pojo.bo.UserBO;
+import com.imooc.pojo.vo.UsersVO;
 import com.imooc.service.UserService;
 import com.imooc.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Api(value = "用户登录注册", tags = {"用于用户登录注册的相关接口"})
 @RestController
@@ -24,8 +27,7 @@ public class PassPortController extends BaseController{
     @Autowired
     UserService userService;
 
-    @Autowired
-    RedisOperator redisOperator;
+
 
     @ApiOperation(value = "判断用户是否存在", notes = "判断用户是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
@@ -79,9 +81,9 @@ public class PassPortController extends BaseController{
         // 4.实现注册
         Users userResult = userService.createUser(userBO);
 
-        userResult = setNullProperty(userResult);
+        UsersVO usersVO = convertUserVO(userResult);
 
-        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(userResult), true);
+        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(usersVO), true);
 
         return IMOOCJSONResult.ok();
     }
@@ -99,22 +101,19 @@ public class PassPortController extends BaseController{
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             return IMOOCJSONResult.errorMsg("用户名或者密码为空");
         }
-
-
-        // 1.
+        // 1. 查询出要登录的用户
         Users result = userService.queryUserForLogin(username, MD5Utils.getMD5Str(password));
-
-        result = setNullProperty(result);
-
-        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(result), true);
-
-        // TODO 生成用户token，存入redis会话
-        // 同步购物车数据
-
+        UsersVO usersVO = convertUserVO(result);
+        // 4. 复制属性设置cookie
+        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(usersVO), true);
+        // 5. 同步购物车数据
         syncShopCart(request, response, result.getId());
+
         return IMOOCJSONResult.ok(result);
 
     }
+
+
 
     /**
      * 1. 如果redis中的数据为空，购物车中也为空，不处理
@@ -131,11 +130,13 @@ public class PassPortController extends BaseController{
         // 1.redis中的数据
         String redisShopCartStr = redisOperator.get(key);
         // 2.cookie中的数据
-        String cookieShopCartStr = CookieUtils.getCookieValue(request, FOODIE_SHOPCART, true);
+        String cookieShopCartStr =
+                CookieUtils.getCookieValue(request, FOODIE_SHOPCART, true);
 
         if (StringUtils.isBlank(redisShopCartStr)) {
-            // 1.
-            redisOperator.set(key, cookieShopCartStr);
+            if (StringUtils.isNotBlank(cookieShopCartStr)){
+                redisOperator.set(key, cookieShopCartStr);
+            }
         } else {
             if (StringUtils.isNotBlank(cookieShopCartStr)) {
                 // 1.cookie的数据会覆盖redis中的数据，然后两个取并集
@@ -175,22 +176,15 @@ public class PassPortController extends BaseController{
                                   HttpServletResponse response) {
 
         // 1. 删除包含有用户信息的cookie
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
         CookieUtils.deleteCookie(request, response, "user");
         CookieUtils.deleteCookie(request, response, FOODIE_SHOPCART);
+
+        // 2. 清空会话
 
         return IMOOCJSONResult.ok();
 
     }
 
-    private Users setNullProperty(Users userResult ) {
-        userResult.setPassword(null);
-        userResult.setMobile(null);
-        userResult.setEmail(null);
-        userResult.setCreatedTime(null);
-        userResult.setUpdatedTime(null);
-        userResult.setBirthday(null);
-
-        return userResult;
-    }
 
 }

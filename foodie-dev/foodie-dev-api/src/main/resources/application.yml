@@ -4,6 +4,8 @@
 #
 ############################################################
 spring:
+#  profiles:
+#    active: dev
   datasource:                                           # 数据源的相关配置
     type: com.zaxxer.hikari.HikariDataSource          # 数据源类型：HikariCP
     driver-class-name: com.mysql.jdbc.Driver          # mysql驱动
@@ -24,13 +26,13 @@ spring:
       max-file-size: 512000           # 图片最大为500kb
       max-request-size: 512000        # 请求最大为500kb
   redis:
-#    host: 192.168.1.60
+    host: 192.168.1.60
     password: imooc
 #    sentinel:
 #      master: imooc-master
 #      nodes: 192.168.1.60:26379,192.168.1.65:26379,192.168.1.66:26379
-    cluster:
-      nodes: 192.168.1.60:6379,192.168.1.65:6379,192.168.1.66:6379,192.168.1.67:6379,192.168.1.68:6379,192.168.1.69:6379
+#    cluster:
+#      nodes: 192.168.1.60:6379,192.168.1.65:6379,192.168.1.66:6379,192.168.1.67:6379,192.168.1.68:6379,192.168.1.69:6379
 ############################################################
 #
 # mybatis 配置

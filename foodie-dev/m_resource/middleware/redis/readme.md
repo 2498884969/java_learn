@@ -306,3 +306,10 @@ redis-cli --cluster create 192.168.1.60:6379 192.168.1.65:6379 192.168.1.66:6379
 - **集群信息检查**
 
 redis-cli --cluster check 192.168.25.64:6380
+
+## 面试题
+
+- 缓存击穿、穿透以及雪崩
+
+> https://blog.csdn.net/kongtiao5/article/details/82771694
+

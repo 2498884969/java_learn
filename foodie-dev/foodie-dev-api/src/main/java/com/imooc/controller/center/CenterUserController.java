@@ -3,6 +3,7 @@ package com.imooc.controller.center;
 import com.imooc.controller.BaseController;
 import com.imooc.pojo.Users;
 import com.imooc.pojo.bo.center.CenterUserBO;
+import com.imooc.pojo.vo.UsersVO;
 import com.imooc.resource.FileUpload;
 import com.imooc.service.center.CenterUserService;
 import com.imooc.utils.CookieUtils;
@@ -54,9 +55,9 @@ public class CenterUserController extends BaseController {
         Users users = centerUserService.updateUserInfo(userId, centerUserBO);
         // 2. 消除关键字段将最新的用户数据写入cookie之中
 
-        users = setNullProperty(users);
-        // TODO 后续要改，增加令牌token，会整合Redis 分布式会话
-        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(users), true);
+        UsersVO usersVO = convertUserVO(users);
+        // 后续要改，增加令牌token，会整合Redis 分布式会话, 要在更新的cookie里面添加token
+        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(usersVO), true);
 
         return IMOOCJSONResult.ok();
 
@@ -115,10 +116,9 @@ public class CenterUserController extends BaseController {
         String faceUrl = fileUpload.getImageServerUrl() + userId + "/"+ newFileName + "?t=" +
         DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
         Users users = centerUserService.updateUserFace(userId, faceUrl);
-
-        users = setNullProperty(users);
-        // TODO 后续要改，增加令牌token，会整合Redis 分布式会话
-        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(users), true);
+        // 后续要改，增加令牌token，会整合Redis 分布式会话, 要在更新的cookie里面添加token
+        UsersVO usersVO = convertUserVO(users);
+        CookieUtils.setCookie(request, response,"user", JsonUtils.objectToJson(usersVO), true);
 
         return IMOOCJSONResult.ok();
     }
@@ -132,14 +132,4 @@ public class CenterUserController extends BaseController {
         return map;
     }
 
-    private Users setNullProperty(Users userResult ) {
-        userResult.setPassword(null);
-        userResult.setMobile(null);
-        userResult.setEmail(null);
-        userResult.setCreatedTime(null);
-        userResult.setUpdatedTime(null);
-        userResult.setBirthday(null);
-
-        return userResult;
-    }
 }
