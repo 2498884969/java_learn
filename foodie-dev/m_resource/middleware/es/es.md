@@ -1489,3 +1489,209 @@ bulk操作和以往的普通请求格式有区别。不要格式化json，不然
 { request body        }\n
 ```
 
+- `{ action: { metadata }}`代表批量操作的类型，可以是新增、删除或修改
+- `\n`是每行结尾必须填写的一个规范，每一行包括最后一行都要写，用于es的解析
+- `{ request body }`是请求body，增加和修改操作需要，删除操作则不需要
+
+**批量操作的类型**
+
+action 必须是以下选项之一:
+
+- create：如果文档不存在，那么就创建它。存在会报错。发生异常报错不会影响其他操作。
+- index：创建一个新文档或者替换一个现有的文档。
+- update：部分更新一个文档。
+- delete：删除一个文档。
+
+metadata 中需要指定要操作的文档的`_index 、 _type 和 _id`，`_index 、 _type`也可以在url中指定
+
+**实操**
+
+- create新增文档数据，在metadata中指定index以及type
+
+```
+POST    /_bulk
+{"create": {"_index": "shop2", "_type": "_doc", "_id": "2001"}}
+{"id": "2001", "nickname": "name2001"}
+{"create": {"_index": "shop2", "_type": "_doc", "_id": "2002"}}
+{"id": "2002", "nickname": "name2002"}
+{"create": {"_index": "shop2", "_type": "_doc", "_id": "2003"}}
+{"id": "2003", "nickname": "name2003"}
+```
+
+- create创建已有id文档，在url中指定index和type
+
+```
+POST    /shop/_doc/_bulk
+{"create": {"_id": "2003"}}
+{"id": "2003", "nickname": "name2003"}
+{"create": {"_id": "2004"}}
+{"id": "2004", "nickname": "name2004"}
+{"create": {"_id": "2005"}}
+{"id": "2005", "nickname": "name2005"}
+```
+
+- index创建，已有文档id会被覆盖，不存在的id则新增
+
+```
+POST    /shop/_doc/_bulk
+{"index": {"_id": "2004"}}
+{"id": "2004", "nickname": "index2004"}
+{"index": {"_id": "2007"}}
+{"id": "2007", "nickname": "name2007"}
+{"index": {"_id": "2008"}}
+{"id": "2008", "nickname": "name2008"}
+```
+
+- update更新部分文档数据
+
+```
+POST    /shop/_doc/_bulk
+{"update": {"_id": "2004"}}
+{"doc":{ "id": "3004"}}
+{"update": {"_id": "2007"}}
+{"doc":{ "nickname": "nameupdate"}}
+```
+
+- delete批量删除
+
+```
+POST    /shop/_doc/_bulk
+{"delete": {"_id": "2004"}}
+{"delete": {"_id": "2007"}}
+```
+
+- 综合批量各种操作
+
+```
+POST    /shop/_doc/_bulk
+{"create": {"_id": "8001"}}
+{"id": "8001", "nickname": "name8001"}
+{"update": {"_id": "2001"}}
+{"doc":{ "id": "20010"}}
+{"delete": {"_id": "2003"}}
+{"delete": {"_id": "2005"}}
+```
+
+----
+
+## 6.es 集群
+
+**前置操作**
+
+当克隆以后，es中的data目录，一定要清空，这里面包含了原先的索引库数据。
+
+**配置集群**
+
+修改`elasticsearch.yml`这个配置文件如下：
+
+```shell
+# 配置集群名称，保证每个节点的名称相同，如此就能都处于一个集群之内了
+cluster.name: imooc-es-cluster
+
+# 每一个节点的名称，必须不一样
+node.name: es-node1
+
+# http端口（使用默认即可）
+http.port: 9200
+
+# 主节点，作用主要是用于来管理整个集群，负责创建或删除索引，管理其他非master节点（相当于企业老总）
+node.master: true
+
+# 数据节点，用于对文档数据的增删改查
+node.data: true
+
+# 集群列表
+discovery.seed_hosts: ["192.168.1.60", "192.168.1.61", "192.168.1.62"]
+
+# 启动的时候使用一个master节点
+cluster.initial_master_nodes: ["es-node1"]
+```
+
+最后可以通过如下命令查看配置文件的内容：
+
+```shell
+more elasticsearch.yml | grep ^[^#]
+
+```
+
+---
+
+**什么是脑裂**
+
+如果发生网络中断或者服务器宕机，那么集群会有可能被划分为两个部分，各自有自己的master来管理，那么这就是脑裂。
+
+**脑裂解决方案**
+
+master主节点要经过多个master节点共同选举后才能成为新的主节点。就跟班级里选班长一样，并不是你1个人能决定的，需要班里半数以上的人决定。
+
+解决实现原理：半数以上的节点同意选举，节点方可成为新的master。
+
+- discovery.zen.minimum_master_nodes=(N/2)+1
+  - N为集群的中master节点的数量，也就是那些 `node.master=true` 设置的那些服务器节点总数。
+
+**es7**
+
+在最新版7.x中，`minimum_master_node`这个参数已经被移除了，这一块内容完全由es自身去管理，这样就避免了脑裂的问题，选举也会非常快。
+
+---
+
+**es的读写原理**
+
+- 写
+
+![](./img/es/es写.PNG)
+
+- 读
+
+![](./img/es/es读.PNG)
+
+## 7.springboot整合es
+
+**创建工程，引入依赖**
+
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+	<!--<version>2.1.5.RELEASE</version>-->
+	<version>2.2.2.RELEASE</version>
+</dependency>
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-test</artifactId>
+	<scope>test</scope>
+</dependency>
+```
+
+**配置yml**
+
+```yaml
+spring:
+  data:
+    elasticsearch:
+      cluster-name: es6
+      cluster-nodes: 192.168.1.187:9300
+```
+
+**版本协调**
+
+目前springboot-data-elasticsearch中的es版本贴合为es-6.4.3，如此一来版本需要统一，把es进行降级。等springboot升级es版本后可以在对接最新版的7.4。
+
+**Netty issue fix**
+
+```java
+@Configuration
+public class ESConfig {
+
+    /**
+     * 解决netty引起的issue
+     */
+    @PostConstruct
+    void init() {
+        System.setProperty("es.set.netty.runtime.available.processors", "false");
+    }
+
+}
+```
+

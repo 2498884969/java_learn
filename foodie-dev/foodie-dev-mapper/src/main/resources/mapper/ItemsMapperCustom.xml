@@ -122,7 +122,7 @@
     </select>
 
     <!--resultType必须写？-->
-    <!--update的锅-->
+    <!--update的锅 但是insert就使用的是select-->
     <update id="decreaseItemSpecStock" >
         UPDATE
             items_spec
