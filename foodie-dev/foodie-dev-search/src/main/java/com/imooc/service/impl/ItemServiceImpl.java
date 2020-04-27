@@ -35,8 +35,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public PagedGridResult searchItems(String keywords, String sort, Integer page, Integer pageSize) {
-        String preTag = "<font color='red'>";
-        String postTag = "</font>";
+//        String preTag = "<font color='red'>";
+//        String postTag = "</font>";
 
         Pageable pageable = PageRequest.of(page, pageSize);
 
@@ -45,13 +45,24 @@ public class ItemServiceImpl implements ItemService {
 //        SortBuilder sortBuilderAge = new FieldSortBuilder("age")
 //                .order(SortOrder.ASC);
 
+        SortBuilder sortBuilder = null;
+
+        if (sort.equals("c")) {
+            sortBuilder = new FieldSortBuilder("sellCounts").order(SortOrder.DESC);
+        }else if (sort.equals("p")) {
+            sortBuilder = new FieldSortBuilder("price").order(SortOrder.ASC);
+        }else{
+            sortBuilder = new FieldSortBuilder("itemName.keyword").order(SortOrder.ASC);
+        }
+
         String itemNameFiled = "itemName";
         SearchQuery query = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.matchQuery(itemNameFiled, keywords))
                 .withHighlightFields(new HighlightBuilder.Field(itemNameFiled)
-                        .preTags(preTag)
-                        .postTags(postTag))
-//                .withSort(sortBuilder)
+//                        .preTags(preTag)
+//                        .postTags(postTag)
+                )
+                .withSort(sortBuilder)
 //                .withSort(sortBuilderAge)
                 .withPageable(pageable)
                 .build();
