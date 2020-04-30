@@ -81,7 +81,7 @@ rabbitmqctl stop
 
 ### 2、文件同步
 
-PS:选择60、61、62任意一个节点为Master（这里选择76为Master），也就是说我们需要把76的Cookie文件同步到61、62节点上去，进入/var/lib/rabbitmq目录下，把/var/lib/rabbitmq/.erlang.cookie文件的权限修改为777，原来是400；然后把.erlang.cookie文件copy到各个节点下；最后把所有cookie文件权限还原为400即可。	
+PS:选择60、61、62任意一个节点为Master（这里选择60为Master），也就是说我们需要把76的Cookie文件同步到61、62节点上去，进入/var/lib/rabbitmq目录下，把/var/lib/rabbitmq/.erlang.cookie文件的权限修改为777，原来是400；然后把.erlang.cookie文件copy到各个节点下；最后把所有cookie文件权限还原为400即可。	
 
 ```shell
 chmod .erlang.cookie 777

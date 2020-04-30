@@ -224,6 +224,8 @@
 						// let $target = e.target || e.srcElement;
 						// let file = $target.files[0];
 					
+						// http://127.0.0.1:8066/fdfs/uploadFace?userId=
+
 						let f = document.getElementById('userFace').files[0];
 						// console.log(f);
 						let multiForm = new FormData() ; 		//创建一个form对象
@@ -232,10 +234,12 @@
 						var userInfo = this.userInfo;
 						// console.log(userInfo);
 						// 请求后端获得最新数据
+						// localhost 127.0.0.1 之间存在跨域？
 						var serverUrl = app.serverUrl;
 						axios.defaults.withCredentials = true;
 						axios.post(
-								serverUrl + '/userInfo/uploadFace?userId=' + userInfo.id, 
+								// serverUrl + '/fdfs/uploadFace?userId=' + userInfo.id, 
+								'http://localhost:8066/fdfs/uploadFace?userId=' + userInfo.id, 
 								multiForm, 
 								{
 									headers: {
@@ -249,13 +253,14 @@
 									// var userInfoMore = res.data.data;
 									// console.log(userInfoMore);
 									alert("头像上传成功!");
-
+									debugger;
 									window.location.reload();
 								} else {
 									alert(res.data.msg);
 									console.log(res.data.msg);
 								}
 							});
+
 					},
 					saveUserInfo() {
 						var userInfoMore = this.userInfoMore;
@@ -371,6 +376,7 @@
 							userCookie != ""
 						) {
 							var userInfoStr = decodeURIComponent(userCookie);
+							debugger;
 							// console.log(userInfoStr);
 							if (
 								userInfoStr != null &&
