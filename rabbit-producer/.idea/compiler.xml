@@ -6,15 +6,37 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="elastic-job-cloud-executor" />
+        <module name="elastic-job-cloud-scheduler" />
+        <module name="elastic-job-common-core" />
+        <module name="elastic-job-common-restful" />
+        <module name="elastic-job-lite-console" />
+        <module name="elastic-job-lite-core" />
+        <module name="elastic-job-lite-lifecycle" />
+        <module name="elastic-job-lite-spring" />
+        <module name="es-job" />
+        <module name="rabbit-api" />
+        <module name="rabbit-common" />
+        <module name="rabbit-core-producer" />
         <module name="rabbit-producer" />
-        <module name="rabbit-producer (1)" />
+        <module name="rabbit-task" />
+        <module name="rabbit-test" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="rabbit-producer (1)" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="es-job" options="-parameters" />
+      <module name="rabbit-api" options="-parameters" />
+      <module name="rabbit-common" options="-parameters" />
+      <module name="rabbit-core-producer" options="-parameters" />
       <module name="rabbit-producer" options="-parameters" />
       <module name="rabbit-producer (1)" options="-parameters" />
+      <module name="rabbit-task" options="-parameters" />
+      <module name="rabbit-test" options="-parameters" />
     </option>
   </component>
 </project>
