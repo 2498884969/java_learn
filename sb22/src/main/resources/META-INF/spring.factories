@@ -1,0 +1,2 @@
+org.springframework.context.ApplicationContextInitializer=com.qxh.sb22.initializer.FirstInitializer
+#org.springframework.context.ApplicationListener=com.qxh.sb22.listener.ForthListener

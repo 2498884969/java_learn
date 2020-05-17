@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="student" class="com.qxh.sb22.ioc.Student">
+        <constructor-arg index="0" value="zhangsan"/>
+        <constructor-arg index="1" value="13"/>
+<!--        <property name="name" value="zhangsan"/>-->
+<!--        <property name="age" value="13"/>-->
+        <property name="classList">
+            <list>
+                <value>math</value>
+                <value>english</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="helloService" class="com.qxh.sb22.ioc.HelloService">
+        <property name="student" ref="student"/>
+        <property name="animal" ref="cat"/>
+    </bean>
+
+    <!--  静态工厂方法  -->
+<!--    <bean id="cat" class="com.qxh.sb22.ioc.StaticAnimalFactory" factory-method="getAnimal">-->
+<!--        <constructor-arg value="cat"/>-->
+<!--    </bean>-->
+
+    <!--  工厂方法  -->
+<!--    <bean id="animalFactory" class="com.qxh.sb22.ioc.AnimalFactory"/>-->
+
+<!--    <bean id="cat" factory-bean="animalFactory" factory-method="getAnimal">-->
+<!--        <constructor-arg value="cat"/>-->
+<!--    </bean>-->
+</beans>
