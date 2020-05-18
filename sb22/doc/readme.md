@@ -209,3 +209,74 @@ https://blog.csdn.net/f641385712/article/details/88041409
 5. 介绍一下refresh中你比较熟悉的方法
 6. 介绍下bean的实例化流程
 ```
+
+## 5. bean
+
+```text
+1. banner.txt
+2. #spring.banner.location=faverate_banner.txt
+3.   #spring.banner.image.location=favorite.jpg
+4. banner.jpg
+5. spring.main.banner-mode=off
+6. springApplication.setBanner()
+```
+
+- 文本输出
+
+```
+    1. 可以通过spring.banner.charset指定字符集
+    2. 获取文本内容
+    3. 替换占位符
+    4. 输出占位符
+```
+
+- 图片输出
+
+```text
+    1. 可以通过spring.banner.image.*设置图片属性
+    2. 读取图片文件流
+    3. 输出图片内容
+```
+
+- 问题
+
+```
+    1. 举例banner常见的获取方式
+    2. 简述下框架内banner打印流程
+    3. 说明下banner获取原理
+    4. 说明下banner输出原理
+    5. 说出你熟悉的banner属性有哪些
+```
+
+## 6. 启动加载器解析
+
+1. StopWatch
+
+- 启动加载器1
+
+```text
+1. 实现CommandLineRunner
+2. 重写run
+3. 通过order来指定顺序
+```
+
+- 启动加载器2
+
+```text
+1. 实现 ApplicationRunner
+2. 重写run
+3. 通过order来指定顺序
+```
+
+> 相同级别的ApplicationRunner优先于CommandLineRunner
+
+- 问题
+
+```text
+1. Springboot计时器的实现？它有哪些优点
+2. 让你去设计实现一个计时器，你的思路
+3. 怎么实现在springboot启动后执行程序
+4. 启动加载器如何实现
+5. 启动加载器的实现由什么异同点
+6. 启动加载器的调用时机
+```
