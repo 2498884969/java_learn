@@ -4,7 +4,7 @@
 # 3. 自动化装配
 ```
 
-## 1.
+## 1. 框架初始化
 
 - 框架初始化
 
@@ -280,3 +280,43 @@ https://blog.csdn.net/f641385712/article/details/88041409
 5. 启动加载器的实现由什么异同点
 6. 启动加载器的调用时机
 ```
+
+## 7. 属性配置
+
+```text
+1. 直接添加
+2. @PropertySource
+3. application.yml
+4. application.properties
+5. application-default.yml
+6. application-default.properties
+7. 操作系统的环境变量值
+8. jvm
+9.  --SPRING_APPLICATION_JSON={\"imooc_url\":\"my_imooc_url_7\"}
+10. 命令行参数 --imooc_url=my_imooc_url_8
+11. SpringBootTest              用于测试
+12. @TestPropertySource         用于测试
+```
+
+- Aware
+
+> spring_bean的生命周期： https://www.jianshu.com/p/1dec08d290c1
+> 深究bean的生命周期： https://www.cnblogs.com/javazhiyin/p/10905294.html
+
+```
+1. Spring框架优点:Bean感知不到容器的存在
+2. 使用场景:需要使用Spring容器的功能资源
+3. 引入缺点:Bean和容器强耦合
+```
+
+- 环境切换
+
+```text
+1. --spring.profiles.default=defaults 不能定义在application文件中
+2. --spring.profiles.active=online
+3. spring.profiles.default与spring.profiles.active互斥
+4. spring.profiles.active=online,online2
+5. --spring.config.name=my
+```
+
+![](./img/获取属性.png)
