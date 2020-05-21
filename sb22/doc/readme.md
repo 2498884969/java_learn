@@ -210,7 +210,7 @@ https://blog.csdn.net/f641385712/article/details/88041409
 6. 介绍下bean的实例化流程
 ```
 
-## 5. bean
+## 5. banner
 
 ```text
 1. banner.txt
@@ -320,3 +320,19 @@ https://blog.csdn.net/f641385712/article/details/88041409
 ```
 
 ![](./img/获取属性.png)
+
+## 8. 异常报告器
+
+> https://www.jianshu.com/p/5932371a8170
+> https://www.cnblogs.com/markLogZhu/p/12517698.html
+
+
+```text
+1. 关闭钩子方法的作用以及使用方法
+2. 介绍下springboot异常报告器类结构
+3. 介绍下springboot异常报告器的实现原理
+4. 讲述下Springboot异常处理流程
+5. springboot异常处理流程中有哪些注意事项
+6. 如何自定义实现springboot异常报告器 
+```
+
