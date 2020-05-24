@@ -336,3 +336,22 @@ https://blog.csdn.net/f641385712/article/details/88041409
 6. 如何自定义实现springboot异常报告器 
 ```
 
+## 9. 异常报告器
+
+```text
+配置类介绍
+```
+
+## 10. servlet启动的奥秘
+
+## 11. starter
+
+```
+condition注解
+https://www.cnblogs.com/zeng1994/p/8c10310d8a042d56eddd40635afb6e93.html
+- starter 与 jar包的区别
+starter能够实现自动配置
+
+# 自定义starter
+https://www.cnblogs.com/hello-shf/p/10864977.html
+```
