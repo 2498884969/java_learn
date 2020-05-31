@@ -7,7 +7,6 @@
     <!--
        1.#{},预编译的方式preparedstatement，使用占位符替换，防止sql注入，一个参数的时候，任意参数名可以接收
        2.${},普通的Statement，字符串直接拼接，不可以防止sql注入，一个参数的时候，必须使用${value}接收参数
-       参考：https://blog.csdn.net/alex_81d/article/details/80897621
      -->
     <select id="queryUserByTableName" resultType="demo.pojo.User">
         select * from ${tableName}
@@ -34,6 +33,9 @@
        useGeneratedKeys:开启主键回写
        keyColumn：指定数据库的主键
        keyProperty：主键对应的pojo属性名
+       官方的说法是该参数的作用是：“允许JDBC支持自动生成主键，需要驱动兼容”，如何理解这句话的意思？
+        其本意是说：对于支持自动生成记录主键的数据库，如：MySQL，SQL Server，
+        此时设置useGeneratedKeys参数值为true，在执行添加记录之后可以获取到数据库自动生成的主键ID。
      -->
     <insert id="insertUser" useGeneratedKeys="true" keyColumn="id" keyProperty="id"
             parameterType="demo.pojo.User">
@@ -50,7 +52,7 @@
         )
         VALUES
         (
-            null,
+            #{id},
             #{userName},
             #{password},
             #{name},

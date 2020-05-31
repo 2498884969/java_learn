@@ -5,6 +5,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -14,54 +16,59 @@ import static org.junit.Assert.*;
 
 public class UserDaoTest {
 
-    public UserDao userDao;
-    public SqlSession sqlSession;
+    private UserDao userDao;
 
-    @org.junit.Before
+    private SqlSession sqlSession;
+
+    @Before
     public void setUp() throws Exception {
 
-        // mybatis-config.xml
+        // 1. 指定全局配置文件
         String resource = "mybatis-config.xml";
-        // 读取配置文件
-        InputStream is = Resources.getResourceAsStream(resource);
-        // 构建SqlSessionFactory
-        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
-        // 获取sqlSession
+        // 2. 读取配置文件
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        // 3. 构建sqlSessionFactory
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 4. 获取sqlSession
         sqlSession = sqlSessionFactory.openSession();
+        // 5. 获取userDao
 //        this.userDao = new UserDaoImpl(sqlSession);
-        // 通过动态代理的方式获取dao实现
+
+        // 6. 使用动态代理
         this.userDao = sqlSession.getMapper(UserDao.class);
-
     }
 
-    @org.junit.Test
+    @Test
     public void queryUserById() {
-        System.out.println(this.userDao.queryUserById("1"));
+        System.err.println(userDao.queryUserById("1"));
     }
 
-    @org.junit.Test
+    @Test
     public void queryUserAll() {
+
         List<User> users = userDao.queryUserAll();
-        users.forEach(System.out::println);
+        users.forEach(
+                System.err::println
+        );
+
     }
 
-    @org.junit.Test
+    @Test
     public void insertUser() {
-
         User user = new User();
-        user.setId("a");
+        user.setId("3");
         user.setAge(16);
         user.setBirthday(new Date("1990/09/02"));
         user.setName("大鹏");
         user.setPassword("123456");
         user.setSex(1);
-        user.setUser_name("evan");
+        user.setUserName("evan");
         this.userDao.insertUser(user);
         this.sqlSession.commit();
 
     }
 
-    @org.junit.Test
+    @Test
     public void updateUser() {
 
         User user = new User();
@@ -69,16 +76,16 @@ public class UserDaoTest {
         user.setName("静鹏");
         user.setPassword("654321");
         user.setSex(1);
-        user.setUser_name("evanjin");
+        user.setUserName("evanjin1");
         user.setId("1");
         this.userDao.updateUser(user);
         this.sqlSession.commit();
 
     }
 
-    @org.junit.Test
+    @Test
     public void deleteUser() {
-        this.userDao.deleteUser("a");
-        this.sqlSession.commit();
+        userDao.deleteUser("3");
+        sqlSession.commit();
     }
 }

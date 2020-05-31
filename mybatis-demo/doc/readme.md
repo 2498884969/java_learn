@@ -34,3 +34,45 @@ INSERT INTO ssmdemo.tb_user (id, user_name, password, name, age, sex, birthday, 
 ```
 
 ## 2. 动态代理
+
+## 3. 插件
+
+```text
+MyBatis 允许你在已映射语句执行过程中的某一点进行拦截调用。默认情况下，MyBatis 允许使用插件来拦截的方法调用包括：
+Executor (update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
+ParameterHandler (getParameterObject, setParameters)
+ResultSetHandler (handleResultSets, handleOutputParameters)
+StatementHandler (prepare, parameterize, batch, update, query)
+```
+
+## 4. 标签
+
+```text
+- select
+select – 书写查询sql语句
+select中的几个属性说明：
+id属性：当前名称空间下的statement的唯一标识。必须。要求id和mapper接口中的方法的名字一致。
+resultType：将结果集映射为java的对象类型。必须（和 resultMap 二选一）
+parameterType：传入参数类型。可以省略
+
+- insert
+insert 的几个属性说明：
+id：唯一标识，随便写，在同一个命名空间下保持唯一，使用动态代理之后要求和方法名保持一致
+parameterType：参数的类型，使用动态代理之后和方法的参数类型一致
+useGeneratedKeys:开启主键回写
+keyColumn：指定数据库的主键
+keyProperty：主键对应的pojo属性名
+标签内部：具体的sql语句。
+
+- update
+id属性：当前名称空间下的statement的唯一标识(必须属性)；
+parameterType：传入的参数类型，可以省略。
+标签内部：具体的sql语句。
+
+- delete
+delete 的几个属性说明：
+id属性：当前名称空间下的statement的唯一标识(必须属性)；
+parameterType：传入的参数类型，可以省略。
+标签内部：具体的sql语句。
+
+```

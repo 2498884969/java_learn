@@ -5,9 +5,6 @@ import org.apache.ibatis.session.SqlSession;
 
 import java.util.List;
 
-/**
- * 1. 实现类
- */
 public class UserDaoImpl implements UserDao {
     public SqlSession sqlSession;
 

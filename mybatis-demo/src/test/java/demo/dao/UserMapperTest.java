@@ -1,5 +1,6 @@
 package demo.dao;
 
+import demo.pojo.User;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -8,38 +9,46 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
+import static org.junit.Assert.*;
 
 public class UserMapperTest {
 
-    public UserMapper userMapper;
+    private UserMapper userMapper;
+    private SqlSession sqlSession;
 
     @Before
     public void setUp() throws Exception {
-        // 指定配置文件
+
+        // 1. 指定全局配置文件
         String resource = "mybatis-config.xml";
-        // 读取配置文件
+        // 2. 读取配置文件
         InputStream inputStream = Resources.getResourceAsStream(resource);
-        // 构建sqlSessionFactory
+        // 3. 构建sqlSessionFactory
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        // 获取sqlSession
-        SqlSession sqlSession = sqlSessionFactory.openSession(true);
-
-        // 1. 映射文件的命名空间（namespace）必须是mapper接口的全路径
-        // 2. 映射文件的statement的id必须和mapper接口的方法名保持一致
-        // 3. Statement的resultType必须和mapper接口方法的返回类型一致
-        // 4. statement的parameterType必须和mapper接口方法的参数类型一致（不一定）
+        // 4. 获取sqlSession
+        sqlSession = sqlSessionFactory.openSession();
+        // 6. 使用动态代理
         this.userMapper = sqlSession.getMapper(UserMapper.class);
-    }
 
+
+    }
 
     @Test
     public void login() {
-        System.out.println(this.userMapper.login("hj", "123456"));
+
+        User user = userMapper.login("hj","123456");
+        System.err.println(user);
     }
 
     @Test
     public void queryUserByTableName() {
+
+        List<User> users = userMapper.queryUserByTableName("tb_user");
+        users.forEach(System.err::println);
     }
 
     @Test
@@ -52,6 +61,18 @@ public class UserMapperTest {
 
     @Test
     public void insertUser() {
+        User user = new User();
+        user.setId(UUID.randomUUID().toString().substring(0,16));
+        user.setAge(20);
+        user.setBirthday(new Date());
+        user.setName("大神");
+        user.setPassword("123456");
+        user.setSex(2);
+        user.setUserName("bigGod222");
+        this.userMapper.insertUser(user);
+        sqlSession.commit();
+        System.out.println(user.getId());
+
     }
 
     @Test

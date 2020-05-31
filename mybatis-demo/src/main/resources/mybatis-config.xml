@@ -2,22 +2,34 @@
 <!DOCTYPE configuration
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
-<!-- 根标签 -->
+<!-- 1. 根标签 -->
 <configuration>
     <properties>
         <property name="driver" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://127.0.0.1:3306/mybatis-110?useUnicode=true&amp;characterEncoding=utf-8&amp;allowMultiQueries=true"/>
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/ssmdemo?characterEncoding=utf-8"/>
         <property name="username" value="root"/>
         <property name="password" value="root"/>
     </properties>
 
-    <!-- 环境，可以配置多个，default：指定采用哪个环境 -->
+    <settings>
+        <!-- 2. 是否开启自动驼峰命名规则（camel case）映射，即从数据库列名 A_COLUMN 到属性名 aColumn 的类似映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <plugins>
+        <!--  插件      -->
+        <plugin interceptor="demo.plugin.ExamplePlugin">
+            <property name="someProperty" value="100"/>
+        </plugin>
+    </plugins>
+
+    <!-- 3. 环境，可以配置多个，default：指定采用哪个环境 -->
     <environments default="test">
         <!-- id：唯一标识 -->
         <environment id="test">
-            <!-- 事务管理器，JDBC类型的事务管理器 -->
+            <!-- 4. 事务管理器，JDBC类型的事务管理器 -->
             <transactionManager type="JDBC" />
-            <!-- 数据源，池类型的数据源 -->
+            <!-- 5. 数据源，池类型的数据源 -->
             <dataSource type="POOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver" />
                 <property name="url" value="jdbc:mysql://127.0.0.1:3306/ssmdemo?characterEncoding=utf-8" />
@@ -29,8 +41,9 @@
             <!-- 事务管理器，JDBC类型的事务管理器 -->
             <transactionManager type="JDBC" />
             <!-- 数据源，池类型的数据源 -->
+            <!-- 6.配置了properties，所以可以直接引用 -->
             <dataSource type="POOLED">
-                <property name="driver" value="${driver}" /> <!-- 配置了properties，所以可以直接引用 -->
+                <property name="driver" value="${driver}" />
                 <property name="url" value="${url}" />
                 <property name="username" value="${username}" />
                 <property name="password" value="${password}" />
@@ -38,8 +51,10 @@
         </environment>
     </environments>
     <mappers>
+        <!--   7.添加mapper     -->
         <mapper resource="mappers/MyMapper.xml" />
         <mapper resource="mappers/UserDaoMapper.xml" />
         <mapper resource="mappers/UserMapper.xml" />
     </mappers>
+
 </configuration>

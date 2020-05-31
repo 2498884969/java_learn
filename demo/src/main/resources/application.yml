@@ -1,0 +1,14 @@
+###服务名称
+spring:
+  profiles:
+    active: 8100
+  application:
+    name: app-eureka-center
+  security:
+    basic:
+      enable: true #开启基于HTTP basic的认证
+    user: #配置用户的账号信息
+      name: qxh
+      password: 123456
+
+
