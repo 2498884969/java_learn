@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="spring-webmvc" />
+        <module name="spring-application" />
+        <module name="autoconfig" />
+        <module name="springboot-webmvc" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="autoconfig" options="-parameters" />
+      <module name="dive-in-spring-boot" options="-parameters" />
+      <module name="spring-application" options="-parameters" />
+      <module name="spring-webmvc" options="-parameters" />
+      <module name="springboot-webmvc" options="-parameters" />
+    </option>
+  </component>
+</project>
